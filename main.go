@@ -105,8 +105,15 @@ func publish(ident string, arch string) {
 				for k, v := range valz {
 					strz = append(strz, fmt.Sprintf("%s=%f", k, v))
 				}
+				role := "misc"
 				st := strings.Join(strz, ",")
-				ln := fmt.Sprintf("%s/%s/%s,unit=%s,arch=%s %s %d\n", ident, e.Container, grp, unit, arch, st, ts.UnixNano())
+				if strings.HasPrefix(e.Container, "agent_") {
+					role = "agent"
+				}
+				if strings.HasPrefix(e.Container, "tracer_") {
+					role = "tracer"
+				}
+				ln := fmt.Sprintf("%s/%s/%s,unit=%s,arch=%s,role=%s %s %d\n", ident, e.Container, grp, unit, arch, role, st, ts.UnixNano())
 				buf.Write([]byte(ln))
 			}
 			//CPU time
