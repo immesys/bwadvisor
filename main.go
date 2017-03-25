@@ -95,7 +95,7 @@ func scrape(iface cadvisor.Interface) {
 type MF map[string]float64
 
 func publish(ident string, arch string) {
-
+	client := &http.Client{}
 	for {
 		e := <-queue
 		buf := bytes.Buffer{}
@@ -155,7 +155,6 @@ func publish(ident string, arch string) {
 		then := time.Now()
 		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
 		defer cancel()
-		client := &http.Client{}
 
 		req, err := http.NewRequest("POST", SERVER, &buf)
 		if err != nil {
@@ -165,11 +164,21 @@ func publish(ident string, arch string) {
 		resp, err := client.Do(req)
 		if err != nil {
 			fmt.Printf("Failed err=%s\n", err)
+			select {
+			case queue <- e:
+				fmt.Printf("Successfully requeued bundle")
+			default:
+			}
 		} else {
+			bdy, _ := ioutil.ReadAll(resp.Body)
 			defer resp.Body.Close()
 			if resp.StatusCode != 200 {
-				bdy, _ := ioutil.ReadAll(resp.Body)
 				fmt.Printf("Failed: %s\n", string(bdy))
+				select {
+				case queue <- e:
+					fmt.Printf("Successfully requeued bundle")
+				default:
+				}
 			} else {
 				fmt.Printf("Published ok %s\n", time.Now().Sub(then))
 			}
