@@ -33,9 +33,19 @@ then
   echo "ERROR PARAM_ROLES required"
   exit 1
 fi
+if [[ -z "$PARAM_NETCLASSES" ]]
+then
+  echo "ERROR PARAM_NETCLASSES required"
+  exit 1
+fi
 if [[ ${#PARAM_ROLES} != $PARAM_NUMCONTAINERS ]]
 then
   echo "ERROR PARAM ROLES IS FUBAR"
+  exit 1
+fi
+if [[ ${#PARAM_NETCLASSES} != $PARAM_NUMCONTAINERS ]]
+then
+  echo "ERROR PARAM NETCLASSES IS FUBAR"
   exit 1
 fi
 
@@ -102,36 +112,60 @@ systemctl enable bwadvisor
 for idx in $(seq 0 $(($PARAM_NUMCONTAINERS - 1)))
 do
   role=${PARAM_ROLES:$idx:1}
+  netclass=${PARAM_NETCLASSES:$idx:1}
+  case $netclass in
+    "A")
+    NET_BW=""
+    NET_DELAY=""
+    ;;
+    "B")
+    NET_BW="17200kbit"
+    NET_DELAY="5ms"
+    ;;
+    "C")
+    NET_BW="2mbit"
+    NET_DELAY="30ms"
+    ;;
+    "D")
+    NET_BW="250kbit"
+    NET_DELAY="250ms"
+    ;;
+  esac
+
   case $role in
     "n")
     offset=$(($idx*2))
     threads=0
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
       -e MAXPEERS=20 -e MAXLIGHTPEERS=5 \
+      -e NET_BW="${NET_BW}" -e NET_DELAY="${NET_DELAY}" \
       $IMAGE)
     printf "CONTAINER_%02d_ID=%s\n" $idx $cid >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ADDR=%s\n" $idx $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${cid}) >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ROLE=%s\n" $idx $role >> /etc/bwadvisor/env.ini
+    printf "CONTAINER_%02d_NETCLASS=%s\n" $idx $netclass >> /etc/bwadvisor/env.ini
     ;;
     "s")
     offset=$(($idx*2))
     threads=0
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
       -e MAXPEERS=2 -e MAXLIGHTPEERS=0 \
+      -e NET_BW="${NET_BW}" -e NET_DELAY="${NET_DELAY}" \
       $IMAGE)
     printf "CONTAINER_%02d_ID=%s\n" $idx $cid >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ADDR=%s\n" $idx $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${cid}) >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ROLE=%s\n" $idx $role >> /etc/bwadvisor/env.ini
+    printf "CONTAINER_%02d_NETCLASS=%s\n" $idx $netclass >> /etc/bwadvisor/env.ini
     ;;
     "m")
     offset=$(($idx*2))
@@ -139,31 +173,35 @@ do
     mineTo=0xf1651ff82a407ab9a210dc94158b728b85909962
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
       -e MAXPEERS=20 -e MAXLIGHTPEERS=0 \
+      -e NET_BW="${NET_BW}" -e NET_DELAY="${NET_DELAY}" \
       $IMAGE)
     printf "CONTAINER_%02d_ID=%s\n" $idx $cid >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ADDR=%s\n" $idx $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${cid}) >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ROLE=%s\n" $idx $role >> /etc/bwadvisor/env.ini
+    printf "CONTAINER_%02d_NETCLASS=%s\n" $idx $netclass >> /etc/bwadvisor/env.ini
     ;;
     "l")
     offset=$(($idx*2))
     threads=0
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
       -e BW2_MAKECONF_OPTS="--light" \
       -e MAXPEERS=20 -e MAXLIGHTPEERS=10 \
+      -e NET_BW="${NET_BW}" -e NET_DELAY="${NET_DELAY}" \
       $IMAGE)
     printf "CONTAINER_%02d_ID=%s\n" $idx $cid >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ADDR=%s\n" $idx $(docker inspect --format='{{range .NetworkSettings.Networks}}{{.IPAddress}}{{end}}' ${cid}) >> /etc/bwadvisor/env.ini
     printf "CONTAINER_%02d_ROLE=%s\n" $idx $role >> /etc/bwadvisor/env.ini
+    printf "CONTAINER_%02d_NETCLASS=%s\n" $idx $netclass >> /etc/bwadvisor/env.ini
     ;;
   esac
 done
