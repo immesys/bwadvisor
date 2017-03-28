@@ -46,8 +46,8 @@ var _ Interface = new(cadvisorClient)
 // TODO(vmarmol): Make configurable.
 // The amount of time for which to keep stats in memory.
 const statsCacheDuration = 1 * time.Minute
-const maxHousekeepingInterval = 5 * time.Second
-const defaultHousekeepingInterval = 1 * time.Second
+const maxHousekeepingInterval = 10 * time.Second
+const defaultHousekeepingInterval = 5 * time.Second
 const allowDynamicHousekeeping = true
 
 func init() {
