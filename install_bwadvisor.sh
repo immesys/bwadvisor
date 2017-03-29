@@ -142,7 +142,7 @@ do
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
-      -e MAXPEERS=20 -e MAXLIGHTPEERS=5 \
+      -e MAXPEERS=20 -e MAXLIGHTPEERS=0 \
       -e NET_BW="${NET_BW}" -e NET_DELAY="${NET_DELAY}" \
       $IMAGE)
     printf "CONTAINER_%02d_ID=%s\n" $idx $cid >> /etc/bwadvisor/env.ini
