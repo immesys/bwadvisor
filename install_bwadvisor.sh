@@ -127,8 +127,8 @@ do
     NET_DELAY="30ms"
     ;;
     "D")
-    NET_BW="250kbit"
-    NET_DELAY="250ms"
+    NET_BW="1mbit"
+    NET_DELAY="100ms"
     ;;
   esac
 
