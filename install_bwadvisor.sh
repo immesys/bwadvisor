@@ -138,7 +138,7 @@ do
     threads=0
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --log-opt max-size=1000m --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
@@ -155,7 +155,7 @@ do
     threads=0
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --log-opt max-size=1000m --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
@@ -173,7 +173,7 @@ do
     mineTo=0xf1651ff82a407ab9a210dc94158b728b85909962
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --log-opt max-size=1000m --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
@@ -190,7 +190,7 @@ do
     threads=0
     extOOB=$((28500+$offset));extDPP=$((4500+$offset))
     extSTT=$((7700+$offset));extPRP=$((30400+$offset));extPR5=$((30400+$offset+1))
-    cid=$(docker run -d --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
+    cid=$(docker run -d --log-opt max-size=1000m --name=bw2paper_agent_${idx}_${role}_${netclass} --cap-add=NET_ADMIN --cap-add=NET_RAW \
       -e EXTERNALIP=$PARAM_EXTERNALIP -e LISTENPORT=$((30400+$offset)) \
       -p $extPRP:$extPRP -p $extPRP:$extPRP/udp -p $extPR5:$extPR5 -p $extPR5:$extPR5/udp \
       -e MINERTHREADS=$threads -e MINERBENIFICIARY=$mineTo \
